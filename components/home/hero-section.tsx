@@ -4,20 +4,36 @@ import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function HeroSection() {
+  const useVideo = true
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <Image
-        src="/images/hero.jpg"
-        alt="Vista panoramica de La Cabana El Rubi en Villarestrepo"
-        fill
-        className="object-cover"
-        priority
-        quality={90}
-      />
+      {useVideo ? (
+        <video
+          className="absolute inset-0 z-0 h-full w-full object-cover object-[center_43%] pointer-events-none"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/images/banner.jpeg"
+          aria-hidden="true"
+        >
+          <source src="/videos/cabana-el-rubi-dron.mp4" type="video/mp4" />
+        </video>
+      ) : (
+        <Image
+          src="/images/banner.jpeg"
+          alt="Vista panoramica de La Cabana El Rubi en Villarestrepo"
+          fill
+          className="object-cover object-[center_43%]"
+          priority
+          quality={90}
+        />
+      )}
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-foreground/50" />
+      <div className="absolute inset-0 z-[1] bg-foreground/45" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center px-6 text-center">

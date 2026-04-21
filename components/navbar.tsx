@@ -33,21 +33,17 @@ export function Navbar() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link
+          href="/"
+          className={`block -translate-x-1 transition-colors duration-300 sm:-translate-x-2 ${
+            scrolled ? "text-primary" : "text-primary-foreground"
+          }`}
+          aria-label="La Cabana El Rubi"
+        >
           <span
-            className={`font-serif text-2xl font-bold tracking-tight transition-colors duration-300 ${
-              scrolled ? "text-primary" : "text-primary-foreground"
-            }`}
-          >
-            La Cabana
-          </span>
-          <span
-            className={`font-serif text-sm font-medium italic transition-colors duration-300 ${
-              scrolled ? "text-accent" : "text-primary-foreground/80"
-            }`}
-          >
-            El Rubi
-          </span>
+            aria-hidden="true"
+            className="block h-[4.75rem] w-[15rem] bg-current [mask:url('/logo-el-rubi.svg')_center/contain_no-repeat] [-webkit-mask:url('/logo-el-rubi.svg')_center/contain_no-repeat] sm:h-[5.5rem] sm:w-[17rem]"
+          />
         </Link>
 
         {/* Desktop Nav */}

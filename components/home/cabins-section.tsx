@@ -10,7 +10,7 @@ const cabins = [
   {
     name: "Cabana A",
     slug: "cabana-a",
-    image: "/images/cabin-a.jpg",
+    image: "/images/cabaña rubi.png",
     capacity: "2 - 4 personas",
     price: "$180.000",
     description: "Ideal para parejas o familias pequenas, con vista a las montanas.",
@@ -18,7 +18,7 @@ const cabins = [
   {
     name: "Cabana B",
     slug: "cabana-b",
-    image: "/images/cabin-b.jpg",
+    image: "/images/cabaña zafiro .png",
     capacity: "2 - 6 personas",
     price: "$250.000",
     description: "Espaciosa y con balcon, perfecta para grupos de amigos.",
