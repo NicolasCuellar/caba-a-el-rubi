@@ -1,0 +1,75 @@
+La Cabaña El Rubí — MVP v2.0 · Contexto para agente IA
+Sistema
+Plataforma web de solicitud de reservas integrada con Google Calendar (registro central) y WhatsApp (comunicación con cliente). Sin pasarela de pagos — el pago se gestiona manualmente por WhatsApp.
+
+Flujo principal de reserva
+Usuario selecciona cabaña y fechas en el formulario web
+Sistema valida disponibilidad contra Google Calendar
+Si hay conflicto → mensaje: "La cabaña seleccionada no está disponible para las fechas solicitadas."
+Si disponible: crea evento en Calendar, bloquea cabaña 4 horas, estado inicial: Pendiente de pago
+Sistema envía WhatsApp automático al cliente confirmando recepción y que será contactado pronto
+Administrador contacta al cliente, coordina pago y actualiza estado manualmente en Calendar
+Si pasan 4h sin cambio de estado → cancelación automática, fechas quedan libres
+Estados (colores en Google Calendar)
+Estado	Color	Comportamiento
+Pendiente de pago	Amarillo	Estado inicial. Expira en 4h si no cambia
+Saldo pendiente	Azul	No expira — pago parcial recibido, el admin gestiona saldo restante manualmente en Calendar
+Confirmada	Verde	Pago total confirmado por el admin
+Cancelada	Rojo	Por cliente, admin o expiración automática
+Tarifas de alojamiento (por noche)
+Ocupación	Entre semana (Lun–Jue, sin festivos)	Fin de semana / Festivo CO (Vie, Sáb, Dom + festivos oficiales CO)
+1 persona	$100.000	$100.000
+Pareja (2 personas)	$180.000	$210.000
+Persona adicional (≥3 pax)	+$70.000/persona	+$70.000/persona
+Reglas:
+
+Si la reserva cruza distintos tipos de día, cada noche se cobra según su propio tipo
+Niños menores de 5 años no generan cargo adicional
+El cargo de $70.000 por adicional incluye desayuno
+Descuento del 25% automático sobre el total (tarifa base + servicios) en reservas de 4 o más noches
+Servicios adicionales (alojamiento)
+Servicio	Valor	Condición
+Decoración romántica	$60.000	Única vez por reserva
+Decoración cumpleaños	$60.000	Única vez por reserva
+Picnic	$85.000	Única vez por reserva
+Pet friendly	$15.000 por mascota	Por cada mascota, única vez
+Desayuno adicional	$20.000 por persona	Por persona que lo solicite
+Paquete Pasadía — grupos y empresas (RF-17)
+Características base:
+
+Horario fijo: 10:00 a.m. – 6:00 p.m. (sin pernocte)
+Tarifa: $50.000 por persona
+Capacidad máxima: 4 personas por cabaña
+Grupos mayores de 4 personas deben solicitar cabañas adicionales
+Descuento del 25% sobre el total cuando el grupo supera 10 personas en total (sumando todas las cabañas utilizadas)
+Modalidad de solicitud:
+
+Vía formulario web (misma plataforma) o directamente con el administrador por WhatsApp
+Aplica el mismo flujo de validación de disponibilidad contra Google Calendar
+El evento se registra en Calendar con el mismo esquema de estados y colores
+El bloqueo temporal de 4 horas aplica igual que en reservas de alojamiento
+Ejemplos de cálculo Pasadía:
+
+Escenario	Cálculo	Total
+6 personas (≤10)	6 × $50.000	$300.000
+12 personas (>10, 25% dto.)	12 × $50.000 − 25%	$450.000
+8 personas en 2 cabañas (≤10)	8 × $50.000	$400.000
+11 personas en 3 cabañas (>10, 25% dto.)	11 × $50.000 − 25%	$412.500
+Formulario — campos requeridos
+Cabaña, fecha entrada/salida, cantidad de huéspedes (niños <5 no cuentan), nombre completo, teléfono WhatsApp, email, servicios adicionales seleccionados, observaciones (opcional). El campo Saldo pendiente no aparece en el formulario público — es de uso exclusivo del admin en Google Calendar.
+
+Evento en Google Calendar
+Título: [Estado] Nombre — Cabaña X Descripción: fechas, huéspedes, servicios seleccionados, nombre, teléfono, email, precio estimado, saldo pendiente (campo manual del admin), observaciones.
+
+Resumen previo al envío (RF-13)
+Antes de confirmar, el sistema muestra al usuario un resumen desglosado noche a noche con:
+
+Tipo de día por cada noche (entre semana / fin de semana / festivo)
+Tarifa aplicada por noche
+Servicios adicionales seleccionados
+Descuento por estadía larga si aplica
+Total estimado final
+Opción de regresar a modificar datos antes de enviar
+Fuera del alcance MVP
+Panel admin web, pagos online, emails automáticos, historial de usuarios, integración OTAs (Booking, Airbnb), cálculo automático de saldo pendiente.
+
