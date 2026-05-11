@@ -28,23 +28,7 @@ export interface WhatsAppResult {
   skipped?:   boolean
 }
 
-// ─────────────────────────────────────────────
-// Emojis como constantes Unicode seguras
-// ─────────────────────────────────────────────
 
-const E = {
-  planta:     "\uD83C\uDF3F",   // 🌿
-  sol:        "\u2600\uFE0F",   // ☀️
-  clipboard:  "\uD83D\uDCCB",   // 📋
-  casa:       "\uD83C\uDFE1",   // 🏡
-  campana:    "\uD83D\uDD14",   // 🔔
-  persona:    "\uD83D\uDC64",   // 👤
-  telefono:   "\uD83D\uDCF1",   // 📱
-  calendario: "\uD83D\uDCC5",   // 📅
-  personas:   "\uD83D\uDC65",   // 👥
-  dinero:     "\uD83D\uDCB0",   // 💰
-  reloj:      "\u23F0",         // ⏰
-} as const
 
 // ─────────────────────────────────────────────
 // Configuración
@@ -176,16 +160,16 @@ export async function notificarClienteReserva(args: {
     .join(" ")
 
   const mensaje = [
-    `\u00A1Hola ${nombre}! ${E.planta}`,
+    `\u00A1Hola ${nombre}!`,
     ``,
     `Tu solicitud de reserva en *La Caba\u00F1a El Rub\u00ED* fue recibida exitosamente.`,
     ``,
-    `${E.clipboard} *Resumen:*`,
+    `*Resumen:*`,
     `\u2022 Caba\u00F1a: ${CABANA_LABEL[args.cabana] ?? args.cabana}`,
     `\u2022 Entrada: ${formatearFecha(args.fechaEntrada)}`,
     `\u2022 Salida:  ${formatearFecha(args.fechaSalida)}`,
     ``,
-    `En breve te contactaremos para confirmar disponibilidad y coordinar el pago. ${E.casa}`,
+    `En breve te contactaremos para confirmar disponibilidad y coordinar el pago.`,
   ].join("\n")
 
   return enviarMensajeTexto(args.telefono, mensaje)
@@ -210,18 +194,18 @@ export async function notificarClientePasadia(args: {
   const cabanasStr = args.cabanas.map((c) => CABANA_LABEL[c] ?? c).join(", ")
 
   const mensaje = [
-    `\u00A1Hola ${nombre}! ${E.sol}`,
+    `\u00A1Hola ${nombre}!`,
     ``,
     `Tu solicitud de *Parad\u00EDa* en *La Caba\u00F1a El Rub\u00ED* fue recibida exitosamente.`,
     ``,
-    `${E.clipboard} *Resumen:*`,
+    `*Resumen:*`,
     `\u2022 Fecha: ${formatearFecha(args.fecha)}`,
     `\u2022 Horario: 10:00 a.m. \u2013 6:00 p.m.`,
     `\u2022 Caba\u00F1a(s): ${cabanasStr}`,
     `\u2022 Personas: ${args.totalPersonas}`,
     `\u2022 Total estimado: $${args.precioTotal.toLocaleString("es-CO")}`,
     ``,
-    `En breve te contactaremos para confirmar y coordinar el pago. ${E.casa}`,
+    `En breve te contactaremos para confirmar y coordinar el pago.`,
   ].join("\n")
 
   return enviarMensajeTexto(args.telefono, mensaje)
@@ -255,23 +239,23 @@ export async function notificarAdminNuevaReserva(args: {
     .join(" ")
 
   const lineas = [
-    `${E.campana} *Nueva solicitud de ${tipoLabel}*`,
+    `*Nueva solicitud de ${tipoLabel}*`,
     ``,
-    `${E.persona} *Cliente:* ${nombre}`,
-    `${E.telefono} *Tel\u00E9fono:* ${args.telefonoCliente}`,
+    `*Cliente:* ${nombre}`,
+    `*Tel\u00E9fono:* ${args.telefonoCliente}`,
     ``,
-    `${E.casa} *Caba\u00F1a(s):* ${cabanasStr}`,
+    `*Caba\u00F1a(s):* ${cabanasStr}`,
     args.fechaSalida
-      ? `${E.calendario} *Fechas:* ${formatearFecha(args.fechaEntrada)} \u2192 ${formatearFecha(args.fechaSalida)}`
-      : `${E.calendario} *Fecha:* ${formatearFecha(args.fechaEntrada)}`,
-    `${E.personas} *Personas:* ${args.personas}`,
+      ? `*Fechas:* ${formatearFecha(args.fechaEntrada)} \u2192 ${formatearFecha(args.fechaSalida)}`
+      : `*Fecha:* ${formatearFecha(args.fechaEntrada)}`,
+    `*Personas:* ${args.personas}`,
   ]
 
   if (args.precioTotal) {
-    lineas.push(`${E.dinero} *Total estimado:* $${args.precioTotal.toLocaleString("es-CO")}`)
+    lineas.push(`*Total estimado:* $${args.precioTotal.toLocaleString("es-CO")}`)
   }
 
-  lineas.push(``, `${E.reloj} Bloqueo autom\u00E1tico: 4 horas. Confirma en Calendar antes de que expire.`)
+  lineas.push(``, `Bloqueo autom\u00E1tico: 4 horas. Confirma en Calendar antes de que expire.`)
 
   return enviarMensajeTexto(adminNumber, lineas.join("\n"))
 }

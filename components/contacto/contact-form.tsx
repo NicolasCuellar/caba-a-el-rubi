@@ -27,7 +27,7 @@ Asunto: ${data.asunto}
 Mensaje: ${data.mensaje}`
 
     const encoded = encodeURIComponent(message)
-    window.open(`https://wa.me/573001234567?text=${encoded}`, "_blank")
+    window.open(`https://wa.me/573118200409?text=${encoded}`, "_blank")
     setSubmitted(true)
   }
 

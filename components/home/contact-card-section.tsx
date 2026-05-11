@@ -6,14 +6,14 @@ const contacts = [
   {
     icon: Phone,
     label: "Telefono",
-    value: "+57 300 123 4567",
+    value: "+57 311 820 0409", 
     href: "tel:+573001234567",
   },
   {
     icon: MessageCircle,
     label: "WhatsApp",
     value: "Escribenos directo",
-    href: "https://wa.me/573001234567?text=Hola%2C%20quiero%20reservar%20en%20La%20Caba%C3%B1a%20El%20Rub%C3%AD",
+    href: "https://wa.me/573118200409?text=Hola%2C%20quiero%20reservar%20en%20La%20Caba%C3%B1a%20El%20Rub%C3%AD",
   },
   {
     icon: Instagram,

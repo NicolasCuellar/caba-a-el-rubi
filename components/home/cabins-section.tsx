@@ -26,7 +26,7 @@ const cabins = [
   {
     name: "Cabaña Esmeralda",
     slug: "cabana-c",
-    image: "/images/cabin-c.jpg",
+    image: "/images/esmeraldahome.jpeg",
     capacity: "2 - 8 personas",
     price: "$320.000",
     description: "Nuestra cabaña más grande con todas las comodidades y lujo.",

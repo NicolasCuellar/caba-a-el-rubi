@@ -6,7 +6,7 @@ const channels = [
     title: "WhatsApp",
     value: "+57 311 820 0409",
     description: "Respuesta inmediata. Escribenos y te atendemos al instante.",
-    href: "https://wa.me/573001234567?text=Hola%2C%20quiero%20informacion%20sobre%20La%20Caba%C3%B1a%20El%20Rub%C3%AD",
+    href: "https://wa.me/573118200409?text=Hola%2C%20quiero%20informacion%20sobre%20La%20Caba%C3%B1a%20El%20Rub%C3%AD",
     accent: true,
   },
   {
