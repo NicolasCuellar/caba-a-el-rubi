@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
   const fechaSalida = sumarDiasIso(fecha, 1)
 
   const disponibilidades = await Promise.all(
-    (cabanas as CabanaId[]).map((c) => verificarDisponibilidad(c, fecha, fechaSalida))
+    (cabanas as CabanaId[]).map((c) => verificarDisponibilidad(c, fecha, fechaSalida, "pasadia"))
   )
 
   const cabanasOcupadas = (cabanas as CabanaId[]).filter((_, i) => !disponibilidades[i])

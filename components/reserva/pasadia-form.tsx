@@ -184,7 +184,10 @@ export function PasadiaForm() {
         cabanasSeleccionadas.map(async (c) => {
           try {
             const params = new URLSearchParams({
-              cabana: c.value, fechaEntrada: fecha, fechaSalida: fechaSalidaStr,
+              cabana: c.value,
+              fechaEntrada: fecha,
+              fechaSalida: fechaSalidaStr,
+              tipo: "pasadia",
             })
             const res  = await fetch(`/api/disponibilidad?${params}`)
             const data = await res.json()

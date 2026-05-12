@@ -29,6 +29,19 @@
  *   enviarWhatsAppCliente() — 100% alineada con la fuente de verdad por título.
  * - El pasadía guarda expiresAt en extendedProperties para que verificarExpiracion()
  *   lo cancele automáticamente tras 4 horas sin confirmación (RF-03/RF-04).
+ *
+ * Cambios v2.3:
+ * - Eventos con HORARIOS REALES (dateTime) en vez de all-day (date):
+ *     · Alojamiento → check-in 15:00 del día entrada, checkout 11:00 del día salida
+ *     · Pasadía     → 10:00 a 18:00 del mismo día
+ *     · Bloqueo admin → 00:00 del día entrada a 23:59 del día previo a la salida
+ *   Esto permite a Google Calendar detectar correctamente el solapamiento
+ *   real entre reservas: una pasadía el día del checkout SÍ se cruza con
+ *   el alojamiento (10:00–11:00 overlap) y queda bloqueada.
+ * - verificarDisponibilidad recibe el tipo de solicitud para calcular el
+ *   rango de tiempo que se va a ocupar y comparar con eventos existentes.
+ *   La detección de solapamiento la hace Google Calendar vía timeMin/timeMax.
+ * - Horarios definidos como constantes en date-utils.ts (única fuente).
  */
  
 import { google, calendar_v3 } from "googleapis"
@@ -43,7 +56,18 @@ import {
   notificarClientePasadiaEmail,
   notificarAdminPasadiaEmail,
 } from "@/lib/email"
-import { finDiaIsoBogota, inicioDiaIsoBogota } from "@/lib/date-utils"
+import {
+  finDiaIsoBogota,
+  inicioDiaIsoBogota,
+  isoConHoraBogota,
+  rangoAlojamientoIsoBogota,
+  rangoBloqueoIsoBogota,
+  rangoPasadiaIsoBogota,
+  HORA_CHECKIN_ALOJAMIENTO,
+  HORA_CHECKOUT_ALOJAMIENTO,
+  HORA_INICIO_PASADIA,
+  HORA_FIN_PASADIA,
+} from "@/lib/date-utils"
  
 // ─────────────────────────────────────────────
 // Tipos exportados
@@ -484,33 +508,56 @@ async function enviarWhatsAppClientePasadia(
 // ─────────────────────────────────────────────
 // Funciones exportadas
 // ─────────────────────────────────────────────
- 
+
 /**
- * RF-02: Verifica si la cabaña está disponible para el rango de fechas.
- * Busca eventos que se solapen (distintos a "cancelada") en el calendario.
+ * RF-02 (v2.3): Verifica si la cabaña está disponible para el rango solicitado.
+ *
+ * El tipo de solicitud determina la "huella temporal" que ocupará el evento:
+ *
+ *   tipo = "alojamiento" → fechaEntrada 15:00 → fechaSalida 11:00
+ *   tipo = "pasadia"     → fechaEntrada 10:00 → fechaEntrada 18:00 (fechaSalida ignorada)
+ *
+ * Google Calendar devuelve únicamente los eventos cuyo rango se solapa con
+ * [timeMin, timeMax), por lo que la comprobación de overlap real entre
+ * alojamientos y pasadías la hace el propio Calendar.
+ *
+ * Ejemplos:
+ *   Alojamiento 10–12 (sale el 12 a las 11:00) + pasadía el 12 (10:00–18:00)
+ *     → overlap 10:00–11:00 del día 12 → NO disponible ✅
+ *
+ *   Alojamiento 10–12 (sale el 12 a las 11:00) + alojamiento entra el 12 a las 15:00
+ *     → sin overlap (4 horas de ventana de limpieza) → disponible ✅
+ *
+ *   Pasadía el 10 (10:00–18:00) + alojamiento entra el 10 a las 15:00
+ *     → overlap 15:00–18:00 → NO disponible ✅
  */
 export async function verificarDisponibilidad(
-  cabana:      CabanaId,
+  cabana:       CabanaId,
   fechaEntrada: string,
-  fechaSalida:  string
+  fechaSalida:  string,
+  tipo:         "alojamiento" | "pasadia" = "alojamiento"
 ): Promise<boolean> {
   const calendar   = getCalendarClient()
   const calendarId = getCalendarId(cabana)
- 
-  // Convertir a ISO 8601 — los eventos all-day usan formato date, no dateTime
-  const timeMin = inicioDiaIsoBogota(fechaEntrada)
-  const timeMax = finDiaIsoBogota(fechaSalida)
- 
+
+  // ── Rango temporal real de la solicitud ───────────────────────────────
+  const rango = tipo === "pasadia"
+    ? rangoPasadiaIsoBogota(fechaEntrada)
+    : rangoAlojamientoIsoBogota(fechaEntrada, fechaSalida)
+
+  // Google Calendar devuelve eventos que se solapan con [timeMin, timeMax).
+  // Como nuestros eventos ya se crean con dateTime que refleja los horarios
+  // reales (v2.3), la detección de overlap funciona naturalmente entre
+  // alojamientos y pasadías.
   const { data } = await calendar.events.list({
     calendarId,
-    timeMin,
-    timeMax,
+    timeMin: rango.start,
+    timeMax: rango.end,
     singleEvents: true,
-    // Traemos solo los eventos que se solapan con el rango
   })
- 
+
   const eventos = data.items ?? []
- 
+
   // Un evento bloquea disponibilidad si su estado NO es "cancelada".
   // Usamos resolverEstadoDesdeEvento() para leer el estado desde el título,
   // así las cancelaciones manuales del admin en Calendar se reconocen de inmediato.
@@ -559,15 +606,26 @@ export async function crearSolicitudReserva(datos: DatosReserva): Promise<string
       summary:     titulo,
       description: descripcion,
       colorId:     COLOR_POR_ESTADO[estado],
-      // Eventos de día completo (all-day) para visualización limpia en Calendar
-      start: { date: datos.fechaEntrada },
-      end:   { date: datos.fechaSalida  },
+      // v2.3: Horario REAL con check-in 15:00 y checkout 11:00.
+      // Esto permite que pasadías el día del checkout (10:00–18:00) se
+      // detecten correctamente como solapados (overlap 10:00–11:00).
+      start: {
+        dateTime: isoConHoraBogota(datos.fechaEntrada, HORA_CHECKIN_ALOJAMIENTO),
+        timeZone: "America/Bogota",
+      },
+      end: {
+        dateTime: isoConHoraBogota(datos.fechaSalida, HORA_CHECKOUT_ALOJAMIENTO),
+        timeZone: "America/Bogota",
+      },
       // Metadata en extendedProperties para facilitar actualizaciones programáticas
       extendedProperties: {
         private: {
+          tipo:          "alojamiento",
           estado,
           cabana:        datos.cabana,
           telefono:      datos.telefono,
+          fechaEntrada:  datos.fechaEntrada,
+          fechaSalida:   datos.fechaSalida,
           expiresAt:     expiracion.toISOString(),
         },
       },
@@ -658,21 +716,34 @@ export async function bloquearCabanaManual(
   const calendar   = getCalendarClient()
   const calendarId = getCalendarId(cabana)
   const estado: EstadoReserva = "bloqueado"
- 
+
+  // v2.3: el bloqueo manual cubre días completos (00:00 → 23:59 del día
+  // anterior a la salida). Así un bloqueo del 10 al 12 ocupa el 10 y el 11
+  // por completo, y el 12 queda libre — igual que la convención de
+  // alojamiento donde fechaSalida es el día de salida.
+  const rango = rangoBloqueoIsoBogota(fechaEntrada, fechaSalida)
+
   const { data: evento } = await calendar.events.insert({
     calendarId,
     requestBody: {
       summary:     `${PREFIJO_ESTADO[estado]} — ${CABANA_LABEL[cabana]} — ${motivo}`,
       description: `Motivo: ${motivo}\nFechas: ${formatearFecha(fechaEntrada)} → ${formatearFecha(fechaSalida)}`,
       colorId:     COLOR_POR_ESTADO[estado],
-      start: { date: fechaEntrada },
-      end:   { date: fechaSalida  },
+      start: { dateTime: rango.start, timeZone: "America/Bogota" },
+      end:   { dateTime: rango.end,   timeZone: "America/Bogota" },
       extendedProperties: {
-        private: { estado, cabana, motivo },
+        private: {
+          tipo: "bloqueo",
+          estado,
+          cabana,
+          motivo,
+          fechaEntrada,
+          fechaSalida,
+        },
       },
     },
   })
- 
+
   if (!evento.id) throw new Error("Google Calendar no devolvió un ID de evento")
   return evento.id
 }
@@ -779,9 +850,17 @@ export async function crearSolicitudPasadia(datos: DatosPasadia): Promise<string
         summary:     titulo,
         description: descripcionBase,
         colorId:     COLOR_POR_ESTADO[estado],
-        // All-day: fecha → fecha + 1 día (bloquea el día completo en Calendar)
-        start: { date: datos.fecha      },
-        end:   { date: datos.fechaSalida },
+        // v2.3: Horario REAL del pasadía 10:00 a 18:00 del mismo día.
+        // Esto permite que un alojamiento que entra el mismo día a las
+        // 15:00 se detecte como solapado (overlap 15:00–18:00).
+        start: {
+          dateTime: isoConHoraBogota(datos.fecha, HORA_INICIO_PASADIA),
+          timeZone: "America/Bogota",
+        },
+        end: {
+          dateTime: isoConHoraBogota(datos.fecha, HORA_FIN_PASADIA),
+          timeZone: "America/Bogota",
+        },
         extendedProperties: {
           private: {
             tipo:          "pasadia",

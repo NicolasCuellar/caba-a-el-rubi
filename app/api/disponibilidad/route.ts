@@ -1,7 +1,7 @@
 /**
  * /app/api/disponibilidad/route.ts
  *
- * GET /api/disponibilidad?cabana=cabana-a&fechaEntrada=2026-04-10&fechaSalida=2026-04-12
+ * GET /api/disponibilidad?cabana=cabana-a&fechaEntrada=2026-04-10&fechaSalida=2026-04-12[&tipo=alojamiento|pasadia]
  *
  * Cambios v2.0:
  * - Lazy-expiration: antes de consultar disponibilidad, expira solicitudes
@@ -11,6 +11,14 @@
  * Cambios v2.1:
  * - expirarPendientesEnRango: filtra eventos PENDIENTE leyendo el titulo
  *   (fuente de verdad), no extendedProperties. Consistente con google-calendar.ts.
+ *
+ * Cambios v2.3:
+ * - Nuevo parámetro opcional ?tipo=alojamiento|pasadia (default: alojamiento).
+ *   Determina la huella horaria de la solicitud al verificar solapamiento:
+ *     · alojamiento → 15:00 entrada → 11:00 salida
+ *     · pasadia     → 10:00 → 18:00 mismo día (fechaSalida = fecha + 1)
+ *   Sin este parámetro, una pasadía el día del checkout no se detectaría
+ *   como conflicto aunque haya overlap real de 10:00–11:00.
  */
 
 import { NextRequest } from "next/server"
@@ -81,6 +89,7 @@ export async function GET(request: NextRequest) {
     const cabana = searchParams.get("cabana")
     const fechaEntrada = searchParams.get("fechaEntrada")
     const fechaSalida = searchParams.get("fechaSalida")
+    const tipoParam = searchParams.get("tipo")
 
     if (!cabana || !fechaEntrada || !fechaSalida) {
       return Response.json(
@@ -95,6 +104,10 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // tipo: opcional, default "alojamiento" (v2.3)
+    const tipo: "alojamiento" | "pasadia" =
+      tipoParam === "pasadia" ? "pasadia" : "alojamiento"
 
     if (!esFechaIsoValida(fechaEntrada) || !esFechaIsoValida(fechaSalida)) {
       return Response.json(
@@ -125,7 +138,8 @@ export async function GET(request: NextRequest) {
     const disponible = await verificarDisponibilidad(
       cabana as CabanaId,
       fechaEntrada,
-      fechaSalida
+      fechaSalida,
+      tipo
     )
 
     return Response.json({ disponible })

@@ -243,7 +243,8 @@ export async function POST(request: Request) {
     const disponible = await verificarDisponibilidad(
       cabana as CabanaId,
       fechaEntrada,
-      fechaSalida
+      fechaSalida,
+      "alojamiento"
     )
 
     if (!disponible) {

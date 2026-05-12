@@ -122,7 +122,12 @@ export function ReservationForm() {
     const verificar = async () => {
       setFormState("verificando")
       try {
-        const params = new URLSearchParams({ cabana, fechaEntrada, fechaSalida })
+        const params = new URLSearchParams({
+          cabana,
+          fechaEntrada,
+          fechaSalida,
+          tipo: "alojamiento",
+        })
         const res    = await fetch(`/api/disponibilidad?${params}`)
         const data   = await res.json()
         if (cancelado) return
