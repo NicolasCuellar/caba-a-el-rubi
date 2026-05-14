@@ -36,7 +36,7 @@ export function Navbar() {
         <Link
           href="/"
           className={`block -translate-x-1 transition-colors duration-300 sm:-translate-x-2 ${
-            scrolled ? "text-primary" : "text-primary-foreground"
+            scrolled ? "text-red-600" : "text-primary-foreground"
           }`}
           aria-label="La Cabana El Rubi"
         >

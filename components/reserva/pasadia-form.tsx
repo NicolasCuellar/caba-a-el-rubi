@@ -23,9 +23,9 @@ import { calcularPasadia, formatCOP, formatFecha, PASADIA } from "@/lib/tarifas"
 // ─────────────────────────────────────────────
 
 const CABANAS: { value: string; label: string }[] = [
-  { value: "cabana-a", label: "Cabaña A" },
-  { value: "cabana-b", label: "Cabaña B" },
-  { value: "cabana-c", label: "Cabaña C" },
+  { value: "cabana-a", label: "Cabaña rubi" },
+  { value: "cabana-b", label: "Cabaña zafiro" },
+  { value: "cabana-c", label: "Cabaña esmeralda" },
 ]
 
 type DisponibilidadEstado = "idle" | "verificando" | "ocupada" | "libre"
