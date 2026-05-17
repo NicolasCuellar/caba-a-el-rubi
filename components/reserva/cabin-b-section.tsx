@@ -107,7 +107,7 @@ export function CabinBSection() {
           <div className="grid grid-cols-2 gap-3 lg:order-2">
             <div className="relative col-span-2 mx-auto w-[75%] overflow-hidden rounded-xl">
               <Image
-                src="/images/cabaña zafiro .Png"
+                src="/images/cabanazafiro.png"
                 alt="Cabaña B exterior con balcon y vista al valle"
                 width={800}
                 height={500}
