@@ -37,7 +37,9 @@ function getResendClient(): Resend | null {
 }
 
 function getRemitente(): string {
-  return process.env.EMAIL_FROM ?? "onboarding@resend.dev"
+  const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev"
+  console.log("[Email] EMAIL_FROM value:", JSON.stringify(from))
+  return from
 }
 
 function getAdminEmail(): string | null {
@@ -655,8 +657,3 @@ export async function notificarAdminPasadiaEmail(datos: DatosPasadia): Promise<v
   }
 }
 
-function getRemitente(): string {
-  const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev"
-  console.log("[Email] EMAIL_FROM value:", JSON.stringify(from))
-  return from
-}
