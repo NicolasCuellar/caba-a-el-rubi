@@ -901,6 +901,9 @@ await Promise.allSettled([
     personas:        datos.totalPersonas,
     precioTotal:     datos.precioTotal,
   }),
+
+  notificarClientePasadiaEmail(datos),
+  notificarAdminPasadiaEmail(datos),
 ])
  
   return eventoIds
