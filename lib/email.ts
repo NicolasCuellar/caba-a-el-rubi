@@ -654,3 +654,9 @@ export async function notificarAdminPasadiaEmail(datos: DatosPasadia): Promise<v
     console.error("[Email] Error al enviar correo al admin (pasadía):", err)
   }
 }
+
+function getRemitente(): string {
+  const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev"
+  console.log("[Email] EMAIL_FROM value:", JSON.stringify(from))
+  return from
+}
