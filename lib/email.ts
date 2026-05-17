@@ -197,35 +197,35 @@ function htmlBoton(href: string, texto: string, color = "#16a34a"): string {
 
 function buildMensajeWhatsAppReserva(datos: DatosReserva): string {
   return [
-    `¡Hola ${datos.nombre}! 🌿`,
+    `\u00A1Hola ${datos.nombre}! \uD83C\uDF3F`,
     ``,
-    `Soy del equipo de *La Cabaña El Rubí*. Recibí tu solicitud de reserva y quiero confirmarte los detalles:`,
+    `Soy del equipo de *La Caba\u00F1a El Rub\u00ED*. Recib\u00ED tu solicitud de reserva y quiero confirmarte los detalles:`,
     ``,
-    `📋 *Resumen:*`,
-    `• Cabaña: ${CABANA_LABEL[datos.cabana]}`,
-    `• Entrada: ${formatearFecha(datos.fechaEntrada)}`,
-    `• Salida:  ${formatearFecha(datos.fechaSalida)}`,
-    `• Huéspedes: ${datos.personas}`,
+    `\uD83D\uDCCB *Resumen:*`,
+    `\u2022 Caba\u00F1a: ${CABANA_LABEL[datos.cabana]}`,
+    `\u2022 Entrada: ${formatearFecha(datos.fechaEntrada)}`,
+    `\u2022 Salida:  ${formatearFecha(datos.fechaSalida)}`,
+    `\u2022 Hu\u00E9spedes: ${datos.personas}`,
     ``,
-    `¿Podemos coordinar el pago para confirmar tu reserva? 🏡`,
+    `\u00BFPodemos coordinar el pago para confirmar tu reserva? \uD83C\uDFE1`,
   ].join("\n")
 }
 
 function buildMensajeWhatsAppPasadia(datos: DatosPasadia): string {
   const cabanasStr = datos.cabanas.map((c) => CABANA_LABEL[c]).join(", ")
   return [
-    `¡Hola ${datos.nombre}! ☀️`,
+    `\u00A1Hola ${datos.nombre}! \u2600\uFE0F`,
     ``,
-    `Soy del equipo de *La Cabaña El Rubí*. Recibí tu solicitud de *Pasadía* y quiero confirmarte los detalles:`,
+    `Soy del equipo de *La Caba\u00F1a El Rub\u00ED*. Recib\u00ED tu solicitud de *Parad\u00EDa* y quiero confirmarte los detalles:`,
     ``,
-    `📋 *Resumen:*`,
-    `• Fecha: ${formatearFecha(datos.fecha)}`,
-    `• Horario: 10:00 a.m. – 6:00 p.m.`,
-    `• Cabaña(s): ${cabanasStr}`,
-    `• Personas: ${datos.totalPersonas}`,
-    `• Total estimado: ${formatCOP(datos.precioTotal)}`,
+    `\uD83D\uDCCB *Resumen:*`,
+    `\u2022 Fecha: ${formatearFecha(datos.fecha)}`,
+    `\u2022 Horario: 10:00 a.m. \u2013 6:00 p.m.`,
+    `\u2022 Caba\u00F1a(s): ${cabanasStr}`,
+    `\u2022 Personas: ${datos.totalPersonas}`,
+    `\u2022 Total estimado: ${formatCOP(datos.precioTotal)}`,
     ``,
-    `¿Podemos coordinar el pago para confirmar? 🏡`,
+    `\u00BFPodemos coordinar el pago para confirmar? \uD83C\uDFE1`,
   ].join("\n")
 }
 
